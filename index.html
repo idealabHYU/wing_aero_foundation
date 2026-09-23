@@ -601,7 +601,7 @@ if (typeof module !== "undefined") module.exports = Core;
       });
       if (k === 2) ticks.forEach(function (a) { h += '<text x="' + X(a) + '" y="' + (bot + 19) + '" text-anchor="middle">' + a + '°</text>'; });
     }
-    h += '<text x="' + ((l + W - r) / 2) + '" y="496" text-anchor="middle" style="font-family:var(--f-body);font-size:11px;font-weight:600">ANGLE OF ATTACK α</text>';
+    h += '<text x="' + ((l + W - r) / 2) + '" y="496" text-anchor="middle" style="fill:var(--ink);font-family:var(--f-disp);font-size:16px;font-weight:700">ANGLE OF ATTACK α</text>';
     document.getElementById("chart").innerHTML = h;
   }
   function niceStep(x) { var p = Math.pow(10, Math.floor(Math.log10(x))), m = x / p; return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p; }
