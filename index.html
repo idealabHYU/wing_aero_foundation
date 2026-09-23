@@ -428,7 +428,7 @@ if (typeof module !== "undefined") module.exports = Core;
       controls.target.set(cx, 0, 0);
       var R = 0.5 * Math.sqrt(Math.pow(bb.max.x - bb.min.x, 2) + Math.pow(2 * bb.max.z, 2));
       var vf = camera.fov * Math.PI / 360, hf = Math.atan(Math.tan(vf) * camera.aspect);
-      var d = 1.12 * R / Math.sin(Math.min(vf, hf)), dir = new THREE.Vector3(-1.35, 0.6, 1.45).normalize();
+      var d = 1.02 * R / Math.sin(Math.min(vf, hf)), dir = new THREE.Vector3(-1.15, 1.05, 1.35).normalize();
       camera.position.set(cx + dir.x * d, dir.y * d, dir.z * d);
       camera.near = L / 200; camera.far = L * 60; camera.updateProjectionMatrix();
       controls.update(); fitted = true;
@@ -443,7 +443,7 @@ if (typeof module !== "undefined") module.exports = Core;
     while (flow.children.length) { var ch = flow.children.pop(); ch.traverse(function (o) { if (o.geometry) o.geometry.dispose(); }); }
     var a = cur.AoA * Math.PI / 180, dir = new THREE.Vector3(Math.cos(a), Math.sin(a), 0).normalize();
     // 3 arrows; length and thickness both scale with Mach (M 0.4 -> 0.5x, M 0.8 -> 1.0x)
-    var mr = cur.Mach / 0.8, len = 0.42 * sceneScale * mr, rad = 0.009 * sceneScale * mr;
+    var mr = cur.Mach / 0.8, len = 0.21 * sceneScale * mr, rad = 0.0045 * sceneScale * mr;
     var x0 = bb.min.x - 0.15 * sceneScale - len;
     [-0.3, 0, 0.3].forEach(function (zf) {
       var o = new THREE.Vector3(x0, 0.02 * sceneScale, zf * w.span);
