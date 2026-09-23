@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
-<title>Wing Aerodynamic Foundation Model</title>
+<title>3D Wing Aerodynamic Foundation Model</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -10,7 +10,7 @@
   --lf:#2E8B57; --hf:#1F4E8C; --mf:#D9822B; --cfd:#0F1B2A;
   --warn:#B45309; --warn-soft:#FDF1DF;
   --view-top:#1B2736; --view-bot:#070B11;
-  --radius:10px;
+  --radius:10px; --crimson:#8C1515;
   --f-disp:"Archivo","Helvetica Neue",Arial,sans-serif;
   --f-body:"IBM Plex Sans","Segoe UI",Arial,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
@@ -19,27 +19,28 @@
   :root:not([data-theme="light"]){
     --bg:#0B1118; --panel:#111A24; --panel2:#16212D; --ink:#E6EDF5; --ink2:#9AAABD; --line:#243242;
     --accent:#6FA8E8; --accent-soft:#16283D; --lf:#5BC08A; --hf:#7AA7E6; --mf:#F0A55A; --cfd:#E6EDF5;
-    --warn:#F2B35C; --warn-soft:#2B2113; color-scheme:dark;
+    --warn:#F2B35C; --warn-soft:#2B2113; --crimson:#E4585D; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0B1118; --panel:#111A24; --panel2:#16212D; --ink:#E6EDF5; --ink2:#9AAABD; --line:#243242;
   --accent:#6FA8E8; --accent-soft:#16283D; --lf:#5BC08A; --hf:#7AA7E6; --mf:#F0A55A; --cfd:#E6EDF5;
-  --warn:#F2B35C; --warn-soft:#2B2113; color-scheme:dark;
+  --warn:#F2B35C; --warn-soft:#2B2113; --crimson:#E4585D; color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:14px}
 .app{max-width:1680px;margin:0 auto;display:grid;gap:14px;grid-template-columns:330px minmax(0,1fr) 340px;grid-template-areas:"head head head" "ctrl view res";}
 header{grid-area:head;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px 32px;align-items:end;padding-block:10px 6px}
-.eyebrow{font-family:var(--f-mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
-header h1{font-family:var(--f-disp);font-weight:800;font-size:clamp(32px,4.2vw,56px);line-height:1.02;letter-spacing:-.02em;margin:6px 0 10px;text-wrap:balance}
-header h1 span{color:var(--accent)}
-.lede{margin:0;font-size:clamp(16px,1.4vw,20px);color:var(--ink2);max-width:52ch;text-wrap:balance}
+header h1{font-family:var(--f-disp);font-weight:800;font-size:clamp(32px,4vw,54px);line-height:1.04;letter-spacing:-.02em;margin:0 0 12px;text-wrap:balance}
+header h1 span{color:var(--accent);display:block}
+.lede{margin:0;font-size:clamp(16px,1.4vw,20px);color:var(--ink)}
+.lede .nw{white-space:nowrap}
 .stats{display:flex;gap:12px;flex-wrap:wrap}
-.stats div{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px 16px;min-width:150px}
-.stats strong{display:block;font-family:var(--f-disp);font-weight:800;font-size:34px;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
-.stats small{display:block;margin-top:6px;font-size:13px;color:var(--ink2);max-width:18ch}
+.stats div{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 20px;min-width:190px}
+.stats strong{display:block;font-family:var(--f-disp);font-weight:800;font-size:46px;line-height:1;color:var(--crimson);font-variant-numeric:tabular-nums}
+.stats small{display:block;margin-top:8px;font-size:17px;font-weight:600;color:var(--ink)}
+.stats .det{display:block;margin-top:4px;font-size:14px;line-height:1.4;color:var(--ink2)}
 .space{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
 .sp{background:var(--panel);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
 .sp.wide{grid-column:span 2}
@@ -47,7 +48,7 @@ header h1 span{color:var(--accent)}
 .sp b{font-family:var(--f-mono);font-weight:500;font-size:19px;color:var(--ink);white-space:nowrap}
 .sp i{font-style:normal;font-size:12.5px;color:var(--ink2)}
 .sp .u{font-family:var(--f-body);font-size:14px;color:var(--ink2);margin-left:3px}
-@media (max-width:900px){header{grid-template-columns:minmax(0,1fr)} .sp.wide{grid-column:span 1}}
+@media (max-width:900px){header{grid-template-columns:minmax(0,1fr)} .sp.wide{grid-column:span 1} .lede .nw{white-space:normal}}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}
 #ctrl{grid-area:ctrl;display:flex;flex-direction:column;min-height:0;max-height:min(80vh,780px);align-self:start}
 #res{grid-area:res;display:flex;flex-direction:column;gap:14px}
@@ -127,14 +128,12 @@ svg text{fill:var(--ink2);font-family:var(--f-mono);font-size:11px}
 <div class="app">
   <header>
     <div class="hero">
-      <div class="eyebrow">KAI AI · Stage 1 · Multi-fidelity surrogate</div>
-      <h1>Wing Aerodynamic <span>Foundation Model</span></h1>
-      <p class="lede">One AI model for a wide, 20-dimensional wing design space — shape in, CL · CD · CM out, in milliseconds.</p>
+      <h1>3D Wing Aerodynamic <span>Multi-Fidelity Foundation Model</span></h1>
+      <p class="lede"><span class="nw">Single AI model for a wide, 20-dimensional wing design space</span> — predicting C<sub>L</sub>, C<sub>D</sub>, C<sub>M</sub> in milliseconds.</p>
     </div>
     <div class="stats">
-      <div><strong>20</strong><small>design &amp; flow inputs</small></div>
-      <div><strong>4,512</strong><small>RANS CFD cases (HF 859 · LF 3,653)</small></div>
-      <div><strong>0.95</strong><small>held-out HF test R², CL (MF)</small></div>
+      <div><strong>20</strong><small>Design &amp; flow inputs</small></div>
+      <div><strong>4,512</strong><small>RANS CFD cases</small><span class="det">859 high-fidelity<br>3,653 low-fidelity</span></div>
     </div>
     <div class="space" aria-label="Design space covered by the model">
       <div class="sp"><em>Area S</em><b>0.1 … 8.8<span class="u">m²</span></b></div>
@@ -193,13 +192,13 @@ svg text{fill:var(--ink2);font-family:var(--f-mono);font-size:11px}
     </div>
     <div class="panel">
       <div class="res-head" style="display:flex;justify-content:space-between;align-items:center"><h2>AoA sweep · this geometry</h2>
-        <div class="tabs" id="tabs"><button type="button" data-k="0" aria-pressed="true">CL</button><button type="button" data-k="1" aria-pressed="false">CD</button><button type="button" data-k="2" aria-pressed="false">CM</button></div></div>
+        <div class="tabs" id="tabs"><button type="button" data-k="0" aria-pressed="true">C<sub>L</sub></button><button type="button" data-k="1" aria-pressed="false">C<sub>D</sub></button><button type="button" data-k="2" aria-pressed="false">C<sub>M</sub></button></div></div>
       <div class="chart-wrap"><svg id="chart" viewBox="0 0 320 200" width="100%" role="img" aria-label="Coefficient versus angle of attack"></svg></div>
       <div class="legend"><span><i class="dot" style="background:var(--lf)"></i>LF-only</span><span><i class="dot" style="background:var(--hf)"></i>HF-only</span><span><i class="dot" style="background:var(--mf)"></i>Multi-fidelity</span><span><i class="dot" style="background:var(--cfd)"></i>CFD sample</span></div>
     </div>
     <div class="panel about">
       <b>Models.</b> Optuna-tuned MLPs (40 trials each). MF = frozen LF surrogate f<sub>L</sub>(x) + HF correction net g([x, f<sub>L</sub>]) with residual skip.
-      <table><tr><th>HF-test R²</th><th>CL</th><th>CD</th><th>CM</th></tr>
+      <table><tr><th>HF-test R²</th><th>C<sub>L</sub></th><th>C<sub>D</sub></th><th>C<sub>M</sub></th></tr>
         <tr><td><i class="dot" style="background:var(--lf)"></i>LF-only</td><td>0.933</td><td>0.953</td><td>0.932</td></tr>
         <tr><td><i class="dot" style="background:var(--hf)"></i>HF-only</td><td>0.907</td><td>0.917</td><td>0.840</td></tr>
         <tr><td><i class="dot" style="background:var(--mf)"></i>MF</td><td>0.953</td><td>0.949</td><td>0.927</td></tr></table>
@@ -507,7 +506,7 @@ if (typeof module !== "undefined") module.exports = Core;
   function fmt(v, k) { return k === 1 ? v.toFixed(4) : v.toFixed(3); }
   function renderTable(P) {
     var t = document.getElementById("coef"), ref = attached ? (attached.k === "HF" ? attached.y : (attached.pair ? attached.pair.y : null)) : null;
-    var h = "<tr><th>Model</th><th>CL</th><th>CD</th><th>CM</th></tr>";
+    var h = "<tr><th>Model</th><th>C<sub>L</sub></th><th>C<sub>D</sub></th><th>C<sub>M</sub></th></tr>";
     MODELS.forEach(function (m) {
       var y = P[m[0]]; h += "<tr" + (m[0] === "mf" ? ' class="best"' : "") + '><td><i class="dot" style="background:' + m[2] + '"></i>' + m[1] + "</td>";
       for (var k = 0; k < 3; k++) h += "<td>" + fmt(y[k], k) + (ref ? '<span class="err">' + ((y[k] - ref[k]) >= 0 ? "+" : "−") + fmt(Math.abs(y[k] - ref[k]), k) + "</span>" : "") + "</td>";
@@ -524,7 +523,7 @@ if (typeof module !== "undefined") module.exports = Core;
       : "Free design — no CFD reference";
     var mf = P.mf;
     document.getElementById("ld").innerHTML = '<div><small>MF  L/D</small><strong>' + (mf[1] > 0 ? (mf[0] / mf[1]).toFixed(1) : "—") + '</strong></div>' +
-      '<div><small>Span b</small><strong>' + wingCache.span.toFixed(2) + ' m</strong></div><div><small>MAC</small><strong>' + wingCache.mac.toFixed(3) + ' m</strong></div>';
+      '<div><small>Span</small><strong>' + wingCache.span.toFixed(2) + ' m</strong></div><div><small>MAC</small><strong>' + wingCache.mac.toFixed(3) + ' m</strong></div>';
   }
   var chartK = 0;
   document.querySelectorAll("#tabs button").forEach(function (b) {
@@ -556,7 +555,7 @@ if (typeof module !== "undefined") module.exports = Core;
     [["lf", "var(--lf)"], ["hf", "var(--hf)"], ["mf", "var(--mf)"]].forEach(function (m) { h += '<circle cx="' + X(cur.AoA) + '" cy="' + Y(P[m[0]][k]) + '" r="3.2" fill="' + m[1] + '"/>'; });
     if (ref) h += '<rect x="' + (X(cur.AoA) - 4.5) + '" y="' + (Y(ref[k]) - 4.5) + '" width="9" height="9" fill="none" stroke="var(--cfd)" stroke-width="1.8"><title>HF CFD</title></rect>';
     if (refL) h += '<path d="M' + (X(cur.AoA) - 5) + "," + (Y(refL[k]) + 4) + "L" + X(cur.AoA) + "," + (Y(refL[k]) - 5) + "L" + (X(cur.AoA) + 5) + "," + (Y(refL[k]) + 4) + 'Z" fill="none" stroke="var(--cfd)" stroke-width="1.4"><title>LF CFD</title></path>';
-    h += '<text x="' + (l + 4) + '" y="' + (t + 11) + '" style="fill:var(--ink)">' + ["CL", "CD", "CM"][k] + "</text>";
+    h += '<text x="' + (l + 4) + '" y="' + (t + 11) + '" style="fill:var(--ink)">C<tspan baseline-shift="sub" font-size="8">' + ["L", "D", "M"][k] + "</tspan></text>";
     document.getElementById("chart").innerHTML = h;
   }
   function niceStep(x) { var p = Math.pow(10, Math.floor(Math.log10(x))), m = x / p; return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p; }
@@ -582,7 +581,7 @@ if (typeof module !== "undefined") module.exports = Core;
     renderTable(P); computeSweep(); renderChart(); warnings();
     document.getElementById("hud").innerHTML = "<b>" + (attached ? attached.id : "Custom wing") + "</b><br>S " + cur.S.toFixed(2) + " m² · AR " + cur.AR.toFixed(2) + " · λ " + cur.taper.toFixed(2) + " · Λ<sub>LE</sub> " + cur.sweep_LE.toFixed(1) + "°" +
       "<br>b " + wingCache.span.toFixed(2) + " m · c<sub>r</sub> " + wingCache.cr.toFixed(3) + " m · c<sub>t</sub> " + wingCache.ct.toFixed(3) + " m" +
-      "<br>M " + cur.Mach.toFixed(2) + " · α " + cur.AoA.toFixed(1) + "° · CL<sub>MF</sub> " + P.mf[0].toFixed(3);
+      "<br>M " + cur.Mach.toFixed(2) + " · α " + cur.AoA.toFixed(1) + "° · C<sub>L,MF</sub> " + P.mf[0].toFixed(3);
   }
 
   /* ---------------- boot: an HF test sample ---------------- */
