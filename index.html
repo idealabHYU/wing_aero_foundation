@@ -126,13 +126,10 @@ svg text{fill:var(--ink2);font-family:var(--f-mono);font-size:11px}
 .line-key.lf{background:var(--lf)}
 .line-key.hf{background:var(--hf)}
 .line-key.mf{height:5px;background:var(--mf);opacity:.94}
-.sweep-line{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:sweepDraw 1.15s cubic-bezier(.22,.72,.24,1) forwards;vector-effect:non-scaling-stroke}
+.sweep-line{fill:none;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .sweep-area{opacity:0;animation:sweepArea .45s ease-out forwards}
-.sweep-tracer{opacity:0;animation:sweepScan 1.15s cubic-bezier(.22,.72,.24,1) forwards;transform-box:fill-box;transform-origin:left center}
 .current-dot{opacity:0;transform-box:fill-box;transform-origin:center;animation:sweepPoint .28s ease-out forwards}
-@keyframes sweepDraw{to{stroke-dashoffset:0}}
 @keyframes sweepArea{to{opacity:.1}}
-@keyframes sweepScan{0%{opacity:0;transform:translateX(0)} 12%{opacity:.45} 88%{opacity:.2} 100%{opacity:0;transform:translateX(480px)}}
 @keyframes sweepPoint{from{opacity:0;transform:scale(.3)} to{opacity:1;transform:scale(1)}}
 .about{padding:12px 14px;font-size:12.5px;color:var(--ink2)}
 .about b{color:var(--ink)}
@@ -159,7 +156,7 @@ svg text{fill:var(--ink2);font-family:var(--f-mono);font-size:11px}
   .hint-action{font-size:11.5px}
   .hint-action kbd{font-size:10px}
 }
-@media (prefers-reduced-motion: reduce){ *,*::before,*::after{transition:none!important;animation:none!important} .sweep-line{stroke-dashoffset:0} .sweep-area{opacity:.1} .current-dot{opacity:1} }
+@media (prefers-reduced-motion: reduce){ *,*::before,*::after{transition:none!important;animation:none!important} .sweep-area{opacity:.1} .current-dot{opacity:1} }
 </style>
 
 <div class="app">
@@ -593,16 +590,54 @@ if (typeof module !== "undefined") module.exports = Core;
       h += '<path class="sweep-area" d="' + mfD + 'L' + X(9).toFixed(1) + ',' + bot + 'L' + X(-3).toFixed(1) + ',' + bot + 'Z" fill="var(--mf)" style="animation-delay:' + (0.72 + k * 0.08) + 's"/>';
       models.forEach(function (m, mi) {
         var d = s[m[0]].map(function (y, i) { return (i ? "L" : "M") + X(s.a[i]).toFixed(1) + "," + Y(y[k]).toFixed(1); }).join("");
-        h += '<path class="sweep-line" pathLength="1" d="' + d + '" stroke="' + m[1] + '" stroke-width="' + m[2] + '" stroke-opacity="' + m[3] + '" style="animation-delay:' + (k * 0.07 + mi * 0.06) + 's"/>';
+        var drawDelay = k * 0.07 + mi * 0.06, clipId = "sweep-clip-" + k + "-" + mi;
+        h += '<defs><clipPath id="' + clipId + '" clipPathUnits="userSpaceOnUse"><rect x="' + l + '" y="' + boxT + '" width="0" height="' + ph + '">' +
+          '<animate class="sweep-runtime-animate sweep-clip-animate" attributeName="width" from="0" to="' + plotW + '" dur="1.15s" begin="indefinite" data-draw-delay="' + drawDelay + '" calcMode="linear" fill="freeze"/></rect></clipPath></defs>' +
+          '<path class="sweep-line" d="' + d + '" stroke="' + m[1] + '" stroke-width="' + m[2] + '" stroke-opacity="' + m[3] + '" clip-path="url(#' + clipId + ')"/>';
       });
-      h += '<line class="sweep-tracer" x1="' + l + '" x2="' + l + '" y1="' + t + '" y2="' + bot + '" stroke="var(--accent)" stroke-width="1.5" style="animation-delay:' + (k * 0.07) + 's"/>';
       models.forEach(function (m, mi) {
         h += '<circle class="current-dot" cx="' + xCur + '" cy="' + Y(P[m[0]][k]) + '" r="' + (m[0] === "mf" ? 5.2 : 4.2) + '" fill="var(--panel)" stroke="' + m[1] + '" stroke-width="' + (m[0] === "mf" ? 3 : 2.2) + '" style="animation-delay:' + (1.0 + k * 0.07 + mi * 0.04) + 's"/>';
       });
       if (k === 2) ticks.forEach(function (a) { h += '<text x="' + X(a) + '" y="' + (bot + 19) + '" text-anchor="middle">' + a + '°</text>'; });
     }
+    var scanTop = top0 + 30, scanBottom = top0 + 2 * (ph + gap) + ph - 10, scanClipRects = "";
+    for (var si = 0; si < 3; si++) {
+      var scanPlotTop = top0 + si * (ph + gap) + 30;
+      scanClipRects += '<rect x="' + l + '" y="' + scanPlotTop + '" width="' + plotW + '" height="' + (ph - 40) + '"/>';
+    }
+    h += '<defs><linearGradient id="sweep-scan-gradient" x1="0" x2="1" y1="0" y2="0">' +
+      '<stop offset="0" style="stop-color:var(--accent);stop-opacity:0"/><stop offset="72%" style="stop-color:var(--accent);stop-opacity:.08"/><stop offset="100%" style="stop-color:var(--accent);stop-opacity:.42"/></linearGradient>' +
+      '<clipPath id="sweep-scan-plots" clipPathUnits="userSpaceOnUse">' + scanClipRects + '</clipPath></defs>' +
+      '<g clip-path="url(#sweep-scan-plots)" pointer-events="none"><g class="sweep-scan" opacity="0">' +
+      '<rect x="' + (l - 46) + '" y="' + scanTop + '" width="46" height="' + (scanBottom - scanTop) + '" fill="url(#sweep-scan-gradient)"/>' +
+      '<line x1="' + l + '" x2="' + l + '" y1="' + scanTop + '" y2="' + scanBottom + '" stroke="var(--accent)" stroke-width="8" stroke-opacity=".12"/>' +
+      '<line x1="' + l + '" x2="' + l + '" y1="' + scanTop + '" y2="' + scanBottom + '" stroke="var(--accent)" stroke-width="1.6" stroke-opacity=".88"/>' +
+      '<animateTransform class="sweep-runtime-animate sweep-scan-motion" attributeName="transform" type="translate" from="0 0" to="' + plotW + ' 0" dur="1.15s" begin="indefinite" data-draw-delay="0" calcMode="linear" fill="freeze"/>' +
+      '<animate class="sweep-runtime-animate sweep-scan-opacity" attributeName="opacity" values="0;.9;.65;0" keyTimes="0;.08;.88;1" dur="1.15s" begin="indefinite" data-draw-delay="0" calcMode="linear" fill="freeze"/>' +
+      '</g></g>';
     h += '<text x="' + ((l + W - r) / 2) + '" y="496" text-anchor="middle" style="fill:var(--ink);font-family:var(--f-disp);font-size:16px;font-weight:700">ANGLE OF ATTACK α</text>';
     document.getElementById("chart").innerHTML = h;
+    startSweepReveal();
+  }
+  function startSweepReveal() {
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var animations = document.querySelectorAll("#chart .sweep-runtime-animate");
+    window.requestAnimationFrame(function () {
+      animations.forEach(function (animation) {
+        var delay = +(animation.getAttribute("data-draw-delay") || 0);
+        if (reduceMotion) {
+          if (animation.classList.contains("sweep-clip-animate")) animation.parentNode.setAttribute("width", animation.getAttribute("to"));
+        } else if (typeof animation.beginElementAt === "function") {
+          animation.beginElementAt(delay);
+        } else if (typeof animation.beginElement === "function") {
+          window.setTimeout(function () {
+            if (animation.isConnected) animation.beginElement();
+          }, delay * 1000);
+        } else {
+          if (animation.classList.contains("sweep-clip-animate")) animation.parentNode.setAttribute("width", animation.getAttribute("to"));
+        }
+      });
+    });
   }
   function niceStep(x) { var p = Math.pow(10, Math.floor(Math.log10(x))), m = x / p; return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p; }
 
