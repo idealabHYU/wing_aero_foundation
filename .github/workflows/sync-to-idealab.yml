@@ -33,5 +33,19 @@ jobs:
             exit 0
           fi
 
-          git remote add idealab "https://x-access-token:${MIRROR_TOKEN}@github.com/idealabHYU/wing_aero_foundation.git"
-          git push idealab HEAD:main
+          git remote add idealab "https://idealabHYU:${MIRROR_TOKEN}@github.com/idealabHYU/wing_aero_foundation.git"
+
+          set +e
+          push_output=$(git push idealab HEAD:main 2>&1)
+          push_status=$?
+          set -e
+
+          {
+            echo "### IDEA LAB mirror push"
+            echo '```text'
+            echo "$push_output"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "$push_output"
+          exit "$push_status"
