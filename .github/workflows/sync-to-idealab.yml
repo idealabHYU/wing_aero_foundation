@@ -26,10 +26,10 @@ jobs:
 
       - name: Push main to IDEA LAB repository
         env:
-          MIRROR_TOKEN: ${{ secrets.IDEALAB_MIRROR_TOKEN }}
+          MIRROR_TOKEN: ${{ secrets.WING_AERO_FOUNDATION_MIRROR }}
         run: |
           if [ -z "$MIRROR_TOKEN" ]; then
-            echo "IDEALAB_MIRROR_TOKEN is not configured yet; skipping synchronization."
+            echo "WING_AERO_FOUNDATION_MIRROR is not configured yet; skipping synchronization."
             exit 0
           fi
 
