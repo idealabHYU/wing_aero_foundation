@@ -1,0 +1,37 @@
+name: Sync to IDEA LAB repository
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-to-idealab
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    if: github.repository == 'sunwoong-yang/wing_aero_foundation'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push main to IDEA LAB repository
+        env:
+          MIRROR_TOKEN: ${{ secrets.IDEALAB_MIRROR_TOKEN }}
+        run: |
+          if [ -z "$MIRROR_TOKEN" ]; then
+            echo "IDEALAB_MIRROR_TOKEN is not configured yet; skipping synchronization."
+            exit 0
+          fi
+
+          git remote add idealab "https://x-access-token:${MIRROR_TOKEN}@github.com/idealabHYU/wing_aero_foundation.git"
+          git push idealab HEAD:main
